@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Práctica: Estados del Hilo y Programación Concurrente</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<style>
+    code { color: black; background-color: yellow;
+
+    }
+</style>
+<body class="bg-light py-4">
+
+<div class="container">
+  <h1 class="text-center text-primary mb-4">☕ Práctica: Estados del Hilo y Programación Concurrente en Java</h1>
+  <p class="lead text-center">
+    Aprende el ciclo de vida de los hilos en Java implementando <code>Runnable</code>, 
+    usando <code>ExecutorService</code> y simulando concurrencia moderna.
+  </p>
+ <!-- 🐙 Sección GitHub -->
+  <div class="text-center my-4 p-3 border rounded bg-white shadow-sm">
+    <h3>🐙 Repositorio en GitHub</h3>
+    <p class="mb-2">
+      Realiza un <strong>fork</strong> del siguiente repositorio antes de comenzar la práctica:
+    </p>
+    <p>
+      <a href="https://github.com/profeInformatica101/ejercicios_hilos_java" 
+         target="_blank" class="btn btn-dark btn-lg">
+        🧩 Ir al repositorio base en GitHub
+      </a>
+    </p>
+    <p class="text-muted small">
+      Tras realizar el fork, tu URL debe quedar así:  
+      <code>https://github.com/&lt;tu_usuario&gt;/ejercicios_hilos_java</code>
+    </p>
+  </div>
+  <!-- 🧵 Tabla de métodos principales -->
+  <table class="table table-striped table-bordered align-middle shadow-sm mt-4">
+    <thead class="table-primary text-center">
+      <tr>
+        <th style="width:5%"> </th>
+        <th>Método</th>
+        <th>Descripción</th>
+        <th>Ejemplo de uso</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="text-center">🪪</td>
+        <td><code>getName()</code> / <code>setName(String)</code></td>
+        <td>Obtiene o establece el nombre del hilo.</td>
+        <td><code>t.setName("Productor"); System.out.println(t.getName());</code></td>
+      </tr>
+      <tr>
+        <td class="text-center">🆔</td>
+        <td><code>getId()</code></td>
+        <td>Devuelve el identificador único del hilo (solo lectura).</td>
+        <td><code>System.out.println("ID: " + t.getId());</code></td>
+      </tr>
+      <tr>
+        <td class="text-center">⚙️</td>
+        <td><code>getPriority()</code> / <code>setPriority(int)</code></td>
+        <td>Consulta o cambia la prioridad del hilo (1–10). Por defecto es 5.</td>
+        <td><code>t.setPriority(Thread.MAX_PRIORITY);</code></td>
+      </tr>
+      <tr>
+        <td class="text-center">📊</td>
+        <td><code>getState()</code></td>
+        <td>Devuelve el estado actual del hilo (<code>NEW</code>, <code>RUNNABLE</code>, <code>BLOCKED</code>, <code>WAITING</code>, <code>TIMED_WAITING</code>, <code>TERMINATED</code>).</td>
+        <td><code>System.out.println(t.getState());</code></td>
+      </tr>
+      <tr>
+        <td class="text-center">💓</td>
+        <td><code>isAlive()</code></td>
+        <td>Indica si el hilo se está ejecutando o aún no ha terminado.</td>
+        <td><code>if (t.isAlive()) { ... }</code></td>
+      </tr>
+      <tr>
+        <td class="text-center">🌙</td>
+        <td><code>isDaemon()</code> / <code>setDaemon(boolean)</code></td>
+        <td>Define si el hilo es de usuario o de servicio (daemon). Los daemon terminan al cerrar la JVM.</td>
+        <td><code>t.setDaemon(true);</code></td>
+      </tr>
+      <tr>
+        <td class="text-center">🧵</td>
+        <td><code>currentThread()</code></td>
+        <td>Método estático que devuelve el hilo que está ejecutando el código.</td>
+        <td><code>Thread actual = Thread.currentThread();</code></td>
+      </tr>
+      <tr>
+        <td class="text-center">⏰</td>
+        <td><code>sleep(long ms)</code></td>
+        <td>Suspende la ejecución del hilo actual durante un tiempo determinado.</td>
+        <td><code>Thread.sleep(1000);</code></td>
+      </tr>
+      <tr>
+        <td class="text-center">⏳</td>
+        <td><code>join()</code></td>
+        <td>Hace que un hilo espere a que otro termine su ejecución.</td>
+        <td><code>t.join();</code></td>
+      </tr>
+      <tr>
+        <td class="text-center">🚨</td>
+        <td><code>interrupt()</code> / <code>isInterrupted()</code></td>
+        <td>Interrumpe la ejecución del hilo o verifica si fue interrumpido.</td>
+        <td><code>t.interrupt(); if (t.isInterrupted()) {...}</code></td>
+      </tr>
+      <tr>
+        <td class="text-center">🔁</td>
+        <td><code>yield()</code></td>
+        <td>Sugiere al planificador que el hilo actual ceda la CPU a otro hilo listo.</td>
+        <td><code>Thread.yield();</code></td>
+      </tr>
+      <tr>
+        <td class="text-center">📜</td>
+        <td><code>toString()</code></td>
+        <td>Devuelve información resumida del hilo (nombre, prioridad, grupo, etc.).</td>
+        <td><code>System.out.println(t.toString());</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 🔗 Fuentes oficiales -->
+  <div class="mt-5">
+    <h4 class="text-secondary mb-3">🔗 Fuentes y enlaces de interés</h4>
+    <ul class="list-group">
+      <li class="list-group-item">
+        ☕ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.html" target="_blank" rel="noopener">
+          Documentación oficial: java.lang.Thread (Java SE 17)
+        </a>
+      </li>
+      <li class="list-group-item">
+        ☕ <a href="https://docs.oracle.com/javase/tutorial/essential/concurrency/" target="_blank" rel="noopener">
+          Tutorial oficial de Concurrencia en Java (Oracle)
+        </a>
+      </li>
+      <li class="list-group-item">
+        ☕ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/Executors.html" target="_blank" rel="noopener">
+          API: java.util.concurrent.Executors
+        </a>
+      </li>
+      <li class="list-group-item">
+        ☕ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletableFuture.html" target="_blank" rel="noopener">
+          API: java.util.concurrent.CompletableFuture
+        </a>
+      </li>
+      <li class="list-group-item">
+        ☕ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/Future.html" target="_blank" rel="noopener">
+          API: java.util.concurrent.Future
+        </a>
+      </li>
+      <li class="list-group-item">
+        ☕ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ScheduledExecutorService.html" target="_blank" rel="noopener">
+          API: java.util.concurrent.ScheduledExecutorService
+        </a>
+      </li>
+    </ul>
+    <p class="mt-3 text-muted small">
+      📚 Recomendación: <em>“Java Concurrency in Practice”</em> — Brian Goetz, Addison-Wesley (2006).
+    </p>
+  </div>
+    <div class="accordion" id="acordeonPractica">
+
+      <!-- 1️⃣ Clase base -->
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="heading0">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse0">
+            🧱 1️⃣ Clase base: Hilo (implementa Runnable)
+          </button>
+        </h2>
+        <div id="collapse0" class="accordion-collapse collapse show" data-bs-parent="#acordeonPractica">
+          <div class="accordion-body">
+            <pre><code>public class Hilo implements Runnable {
+    private final String nombre;
+
+    public Hilo(String nombre) {
+        this.nombre = nombre;
+    }
+
+    @Override
+    public void run() {
+        System.out.println("🟢 Iniciando hilo: " + nombre +
+                           " en " + Thread.currentThread().getName());
+        try {
+            Thread.sleep((int)(Math.random() * 500 + 200));
+        } catch (InterruptedException e) {
+            System.out.println("⚠️ " + nombre + " interrumpido");
+        }
+        System.out.println("🔴 Finaliza hilo: " + nombre);
+    }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2️⃣ Estados -->
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="heading1">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+            ⚙️ 2️⃣ Estados del ciclo de vida del hilo
+          </button>
+        </h2>
+        <div id="collapse1" class="accordion-collapse collapse" data-bs-parent="#acordeonPractica">
+          <div class="accordion-body">
+
+            <h5 class="text-success">🟢 Rama <code>feature/estado-new</code></h5>
+            <pre><code>public class LanzaHilosNew {
+    public static void main(String[] args) {
+        Thread h = new Thread(new Hilo("nuevo"));
+        System.out.println(h.getName() + " -> " + h.getState());
+    }
+}</code></pre>
+
+            <h5 class="text-success">🟡 Rama <code>feature/estado-runnable</code></h5>
+            <pre><code>public class LanzaHilosRunnable {
+    public static void main(String[] args) throws InterruptedException {
+        Thread h = new Thread(new Hilo("runnable"));
+        h.start();
+        Thread.sleep(50);
+        System.out.println(h.getName() + " -> " + h.getState());
+    }
+}</code></pre>
+
+            <h5 class="text-success">🟠 Rama <code>feature/estado-blocked</code></h5>
+            <pre><code>public class LanzaHilosBlocked {
+    private static final Object LOCK = new Object();
+
+    public static void main(String[] args) throws InterruptedException {
+        Thread t1 = new Thread(() -> {
+            synchronized (LOCK) {
+                try { Thread.sleep(2000); } catch (InterruptedException ignored) {}
+            }
+        }, "t1");
+
+        Thread t2 = new Thread(() -> {
+            synchronized (LOCK) {
+                System.out.println("Bloqueado: " + Thread.currentThread().getName());
+            }
+        }, "t2");
+
+        t1.start();
+        Thread.sleep(100);
+        t2.start();
+        Thread.sleep(50);
+        System.out.println(t2.getName() + " -> " + t2.getState());
+    }
+}</code></pre>
+
+            <h5 class="text-success">🔵 Rama <code>feature/estado-waiting</code></h5>
+            <pre><code>public class LanzaHilosWaiting {
+    private static final Object LOCK = new Object();
+
+    public static void main(String[] args) throws InterruptedException {
+        Thread t = new Thread(() -> {
+            synchronized (LOCK) {
+                try {
+                    System.out.println(Thread.currentThread().getName() + " esperando...");
+                    LOCK.wait();
+                } catch (InterruptedException ignored) {}
+            }
+        }, "tWaiting");
+        t.start();
+        Thread.sleep(100);
+        System.out.println(t.getName() + " -> " + t.getState());
+    }
+}</code></pre>
+
+            <h5 class="text-success">🔴 Rama <code>feature/estado-timed-waiting</code></h5>
+            <pre><code>public class LanzaHilosTimed {
+    public static void main(String[] args) throws InterruptedException {
+        Thread t = new Thread(new Hilo("tiempo"));
+        t.start();
+        Thread.sleep(50);
+        System.out.println(t.getName() + " -> " + t.getState());
+    }
+}</code></pre>
+
+            <h5 class="text-success">⚫ Rama <code>feature/estado-terminated</code></h5>
+            <pre><code>public class LanzaHilosTerminated {
+    public static void main(String[] args) throws InterruptedException {
+        Thread t = new Thread(new Hilo("finalizado"));
+        t.start();
+        t.join();
+        System.out.println(t.getName() + " -> " + t.getState());
+    }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3️⃣ Simulación aleatoria -->
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="heading2">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+            🎲 3️⃣ Simulación aleatoria de N hilos
+          </button>
+        </h2>
+        <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#acordeonPractica">
+          <div class="accordion-body">
+            <p>En esta versión se lanza un número variable de hilos que se ejecutan aleatoriamente, 
+              mostrando el comportamiento concurrente en tiempo real.</p>
+
+            <pre><code>import java.util.*;
+
+public class SimuladorHilos {
+
+    public static void nHilos(int n) {
+        List&lt;Thread&gt; lista = new ArrayList&lt;&gt;();
+
+        // Crear los hilos
+        for (int i = 1; i &lt;= n; i++) {
+            Thread t = new Thread(new Hilo("Hilo-" + i));
+            lista.add(t);
+        }
+
+        // Mezclar orden de ejecución
+        Collections.shuffle(lista);
+
+        // Ejecutar aleatoriamente
+        for (Thread t : lista) {
+            t.start();
+            try {
+                Thread.sleep((int)(Math.random() * 300));
+            } catch (InterruptedException e) {}
+        }
+
+        // Esperar a que terminen todos
+        for (Thread t : lista) {
+            try { t.join(); } catch (InterruptedException ignored) {}
+        }
+
+        System.out.println("\n✅ Todos los hilos han terminado su ejecución.");
+    }
+
+    public static void main(String[] args) {
+        nHilos(5);
+    }
+}</code></pre>
+
+            <p class="text-secondary">💡 Prueba con distintos valores (por ejemplo, <code>nHilos(10)</code>) 
+              para observar la aleatoriedad y los diferentes nombres de hilos.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4️⃣ Executor -->
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="heading3">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+            🚀 4️⃣ Programación moderna con ExecutorService y CompletableFuture
+          </button>
+        </h2>
+        <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#acordeonPractica">
+          <div class="accordion-body">
+
+            <h5 class="text-primary">🌐 Rama <code>feature/executor-service-demo</code></h5>
+            <pre><code>import java.util.concurrent.*;
+
+public class ExecutorDemo {
+    public static void main(String[] args) throws Exception {
+        ExecutorService pool = Executors.newFixedThreadPool(3);
+        for (int i = 1; i &lt;= 5; i++) pool.submit(new Hilo("tarea-" + i));
+        pool.shutdown();
+        pool.awaitTermination(3, TimeUnit.SECONDS);
+        System.out.println("✅ Todas las tareas completadas.");
+    }
+}</code></pre>
+
+            <h5 class="text-primary">🔗 Rama <code>feature/completablefuture-demo</code></h5>
+            <pre><code>import java.util.concurrent.*;
+
+public class CompletableDemo {
+    public static void main(String[] args) throws Exception {
+        ExecutorService pool = Executors.newFixedThreadPool(4);
+
+        CompletableFuture.supplyAsync(() -> {
+            System.out.println("Cálculo 1 en " + Thread.currentThread().getName());
+            return 5;
+        }, pool)
+        .thenApply(x -> x * 2)
+        .thenAcceptAsync(resultado ->
+            System.out.println("Resultado final: " + resultado),
+            pool)
+        .get();
+
+        pool.shutdown();
+    }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5️⃣ Entrega -->
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="heading4">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4">
+            📋 5️⃣ Ramas del repositorio y entrega
+          </button>
+        </h2>
+        <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#acordeonPractica">
+          <div class="accordion-body">
+            <ul class="list-group">
+              <li class="list-group-item"><strong>feature/estado-new</strong> → hilo creado, no iniciado</li>
+              <li class="list-group-item"><strong>feature/estado-runnable</strong> → hilo en ejecución</li>
+              <li class="list-group-item"><strong>feature/estado-blocked</strong> → bloqueo con synchronized</li>
+              <li class="list-group-item"><strong>feature/estado-waiting</strong> → en espera indefinida</li>
+              <li class="list-group-item"><strong>feature/estado-timed-waiting</strong> → en espera temporal</li>
+              <li class="list-group-item"><strong>feature/estado-terminated</strong> → hilo finalizado</li>
+              <li class="list-group-item"><strong>feature/executor-service-demo</strong> → uso de pool de hilos</li>
+              <li class="list-group-item"><strong>feature/completablefuture-demo</strong> → tareas asíncronas encadenadas</li>
+              <li class="list-group-item"><strong>feature/simulador-nhilos</strong> → creación y ejecución aleatoria de hilos</li>
+            </ul>
+            <p class="mt-3 text-secondary"><em>💡 Entrega: sube cada rama al repositorio forkeado y muestra su ejecución en vídeo o captura.</em></p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
