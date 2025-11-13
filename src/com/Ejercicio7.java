@@ -17,10 +17,7 @@ public class Ejercicio7 {
 				} catch (InterruptedException e) {
 
 					System.out.println("el hilo ha sido interrrumpido ");
-					
-					
-					
-					
+
 				}
 
 			}
@@ -34,7 +31,7 @@ public class Ejercicio7 {
 			// TODO Auto-generated catch block
 		}
 		t1.interrupt();
-		
+
 	}
 
 }
